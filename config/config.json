@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "Tanloc@2703",
+    "password": "Tanloc@123",
     "database": "vexere_db",
     "host": "127.0.0.1",
     "dialect": "mysql"
