@@ -2,7 +2,10 @@
   "name": "vexere-api",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
   "license": "MIT",
   "dependencies": {
     "express": "4.17.1",
