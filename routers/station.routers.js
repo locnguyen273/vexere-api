@@ -8,13 +8,15 @@ const {
   deleteStation,
 } = require("../controllers/station.controllers");
 const { checkExist } = require("../middlewares/validations/checkExist");
+const { authenticate } = require("../middlewares/auth/authenticate");
+const { authorize } = require("../middlewares/auth/authorize");
 const stationRouter = express.Router();
 
-stationRouter.post("/", createStation);
+stationRouter.post("/", authenticate, authorize(["ADMIN", "SUPERADMIN"]), createStation);
 stationRouter.get("/", getAllStation);
 stationRouter.get("/:id", getDetailStation);
-stationRouter.put("/:id", checkExist(Station), updateStation);
-stationRouter.delete("/:id", checkExist(Station), deleteStation);
+stationRouter.put("/:id", authenticate, authorize(["ADMIN", "SUPERADMIN"]), checkExist(Station), updateStation);
+stationRouter.delete("/:id", authenticate, authorize(["ADMIN", "SUPERADMIN"]), checkExist(Station), deleteStation);
 
 module.exports = {
   stationRouter,
