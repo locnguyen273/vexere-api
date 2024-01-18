@@ -2,11 +2,13 @@ const { where } = require("sequelize");
 const { User } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatarUrl = require('gravatar');
 
 const register = async (req, res) => {
   const { name, email, password, numberPhone } = req.body;
   try {
     //tạo ra 1 chuỗi ngẫu nhiên
+    const avatarUrl = gravatarUrl.url(email, { protocol: 'https', s: '100' });
     const salt = bcrypt.genSaltSync(10);
     //mã hóa chuỗi ngẫu nhiên salt + pass
     const hashPassword = bcrypt.hashSync(password, salt);
@@ -15,6 +17,7 @@ const register = async (req, res) => {
       email,
       password: hashPassword,
       numberPhone,
+      avatar: avatarUrl,
     });
     res.status(201).send({
       message: "Đã tạo người dùng mới thành công!",
@@ -33,6 +36,7 @@ const login = async (req, res) => {
     },
   });
   if (user) {
+    const { name, email, numberPhone, avatar, type } = user;
     const isAuth = bcrypt.compareSync(password, user.password);
     if (isAuth) {
       const token = jwt.sign(
@@ -43,8 +47,13 @@ const login = async (req, res) => {
       res.status(200).send({
         message: "Đăng nhập thành công!",
         data: {
-          token
-        }
+          name,
+          email,
+          numberPhone,
+          avatar,
+          type,
+          token,
+        },
       });
     } else {
       res.status(500).send({
@@ -58,7 +67,20 @@ const login = async (req, res) => {
   }
 };
 
+const uploadAvatar = async (req, res) => {
+  const { file } = req;
+  const { user } = req;
+  const urlImage = `http://localhost:3000/${file.path}`;
+  const userFound = await User.findOne({
+    email: user.email,
+  });
+  userFound.avatar = urlImage;
+  await userFound.save();
+  res.status(200).send({ message: "Đã upload ảnh thành công!" });
+};
+
 module.exports = {
   register,
   login,
+  uploadAvatar,
 };
